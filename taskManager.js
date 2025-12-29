@@ -1,7 +1,7 @@
 /**
- * TaskManager - Manages all tasks
+ * TaskManager - Central task management system
  * Design Pattern: Singleton Pattern
- * Reason: Ensures single source of truth for all task data
+ * Reason: Ensures single source of truth for all tasks
  * Design Pattern: Observer Pattern
  * Reason: Notifies UI automatically when tasks change
  */
@@ -9,15 +9,19 @@ class TaskManager {
     static instance = null;
     
     constructor() {
+        // Singleton: Return existing instance if already created
         if (TaskManager.instance) {
             return TaskManager.instance;
         }
+        
         this.tasks = [];
-        this.observers = [];
+        this.observers = []; // Observer pattern
         TaskManager.instance = this;
-        console.log('✅ TaskManager Singleton created');
     }
     
+    /**
+     * Singleton: Get the single instance
+     */
     static getInstance() {
         if (!TaskManager.instance) {
             TaskManager.instance = new TaskManager();
@@ -25,12 +29,31 @@ class TaskManager {
         return TaskManager.instance;
     }
     
-    // Observer Pattern Methods
+    // ============================================
+    // OBSERVER PATTERN METHODS
+    // ============================================
+    
+    /**
+     * Register an observer to be notified of changes
+     */
     addObserver(observer) {
         this.observers.push(observer);
         console.log('✅ Observer registered');
     }
     
+    /**
+     * Remove an observer
+     */
+    removeObserver(observer) {
+        const index = this.observers.indexOf(observer);
+        if (index > -1) {
+            this.observers.splice(index, 1);
+        }
+    }
+    
+    /**
+     * Notify all observers of changes
+     */
     notifyObservers() {
         this.observers.forEach(observer => {
             if (observer && typeof observer.update === 'function') {
@@ -39,83 +62,163 @@ class TaskManager {
         });
     }
     
-    // FR1: Create new task
+    // ============================================
+    // CRUD OPERATIONS
+    // ============================================
+    
+    /**
+     * FR1: Create a new task
+     * @returns {Task} Created task
+     */
     createTask(title, description, deadline, priority) {
         try {
+            // Validate inputs
+            if (!title || !deadline || !priority) {
+                throw new Error('Title, deadline, and priority are required');
+            }
+            
+            // Create task using Factory Pattern
             const task = TaskFactory.createTask(title, description, deadline, priority);
+            
+            // Add to tasks array
             this.tasks.push(task);
+            
+            // FR8: Auto-save
             this.saveTasks();
+            
+            // Notify observers
             this.notifyObservers();
+            
             console.log('✅ Task created:', task.title);
             return task;
+            
         } catch (error) {
             console.error('❌ Error creating task:', error);
             throw error;
         }
     }
     
-    // FR2: Update existing task
+    /**
+     * FR2: Update an existing task
+     */
     updateTask(id, updates) {
         try {
             const task = this.tasks.find(t => t.id === id);
-            if (task) {
-                Object.assign(task, updates);
-                this.saveTasks();
-                this.notifyObservers();
-                console.log('✅ Task updated');
-                return task;
+            
+            if (!task) {
+                throw new Error('Task not found');
             }
-            return null;
+            
+            // Update task properties
+            Object.assign(task, updates);
+            
+            // FR8: Auto-save
+            this.saveTasks();
+            
+            // Notify observers
+            this.notifyObservers();
+            
+            console.log('✅ Task updated:', task.title);
+            return task;
+            
         } catch (error) {
             console.error('❌ Error updating task:', error);
             throw error;
         }
     }
     
-    // FR3: Delete task
+    /**
+     * FR3: Delete a task
+     */
     deleteTask(id) {
         try {
             const index = this.tasks.findIndex(t => t.id === id);
-            if (index !== -1) {
-                this.tasks.splice(index, 1);
-                this.saveTasks();
-                this.notifyObservers();
-                console.log('✅ Task deleted');
-                return true;
+            
+            if (index === -1) {
+                throw new Error('Task not found');
             }
-            return false;
+            
+            const deletedTask = this.tasks.splice(index, 1)[0];
+            
+            // FR8: Auto-save
+            this.saveTasks();
+            
+            // Notify observers
+            this.notifyObservers();
+            
+            console.log('✅ Task deleted:', deletedTask.title);
+            return true;
+            
         } catch (error) {
             console.error('❌ Error deleting task:', error);
             throw error;
         }
     }
     
-    // FR4: Get all tasks
+    /**
+     * FR4: Get all tasks
+     */
     getAllTasks() {
-        return [...this.tasks];
+        return [...this.tasks]; // Return copy
     }
     
-    // FR6: Mark task as completed
-    markAsCompleted(id) {
-        return this.updateTask(id, { status: 'Completed' });
-    }
-    
-    markAsNotCompleted(id) {
-        return this.updateTask(id, { status: 'ToDo' });
-    }
-    
+    /**
+     * Get a single task by ID
+     */
     getTaskById(id) {
         return this.tasks.find(t => t.id === id);
     }
     
-    // FR9: Load tasks from storage
+    /**
+     * FR6: Mark task as completed
+     */
+    markAsCompleted(id) {
+        try {
+            const task = this.updateTask(id, { status: 'Completed' });
+            console.log('✅ Task marked as completed:', task.title);
+            return task;
+        } catch (error) {
+            console.error('❌ Error marking task as completed:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Mark task as not completed (bonus feature)
+     */
+    markAsNotCompleted(id) {
+        try {
+            const task = this.updateTask(id, { status: 'ToDo' });
+            console.log('✅ Task marked as not completed:', task.title);
+            return task;
+        } catch (error) {
+            console.error('❌ Error marking task as not completed:', error);
+            throw error;
+        }
+    }
+    
+    // ============================================
+    // STORAGE OPERATIONS
+    // ============================================
+    
+    /**
+     * FR9: Load tasks from storage on startup
+     */
     loadTasks() {
         try {
             const savedTasks = StorageManager.loadTasks();
-            this.tasks = savedTasks.map(taskData => TaskFactory.fromObject(taskData));
+            
+            // Convert plain objects to Task instances
+            this.tasks = savedTasks.map(taskData => 
+                TaskFactory.fromObject(taskData)
+            );
+            
+            // Notify observers
             this.notifyObservers();
+            
             console.log(`✅ Loaded ${this.tasks.length} tasks`);
             return this.tasks;
+            
         } catch (error) {
             console.error('❌ Error loading tasks:', error);
             this.tasks = [];
@@ -123,15 +226,73 @@ class TaskManager {
         }
     }
     
-    // FR8: Save tasks to storage
+    /**
+     * FR8: Save tasks to storage
+     */
     saveTasks() {
-        return StorageManager.saveTasks(this.tasks);
+        try {
+            StorageManager.saveTasks(this.tasks);
+            return true;
+        } catch (error) {
+            console.error('❌ Error saving tasks:', error);
+            return false;
+        }
     }
     
-    // FR10: Export tasks
+    /**
+     * FR10: Export tasks to file
+     */
     exportTasks() {
-        return StorageManager.exportToFile(this.tasks);
+        try {
+            StorageManager.exportToFile(this.tasks);
+            console.log('✅ Tasks exported successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ Error exporting tasks:', error);
+            return false;
+        }
+    }
+    
+    // ============================================
+    // UTILITY METHODS
+    // ============================================
+    
+    /**
+     * Get task statistics
+     */
+    getStatistics() {
+        const total = this.tasks.length;
+        const completed = this.tasks.filter(t => t.status === 'Completed').length;
+        const pending = total - completed;
+        const highPriority = this.tasks.filter(t => t.priority === 'High').length;
+        
+        const now = new Date();
+        const overdue = this.tasks.filter(t => 
+            t.status !== 'Completed' && new Date(t.deadline) < now
+        ).length;
+        
+        return {
+            total,
+            completed,
+            pending,
+            highPriority,
+            overdue
+        };
+    }
+    
+    /**
+     * Clear all tasks
+     */
+    clearAllTasks() {
+        try {
+            this.tasks = [];
+            this.saveTasks();
+            this.notifyObservers();
+            console.log('✅ All tasks cleared');
+            return true;
+        } catch (error) {
+            console.error('❌ Error clearing tasks:', error);
+            return false;
+        }
     }
 }
-
-console.log('✅ TaskManager class defined');

@@ -2,24 +2,22 @@
 
 A simple task management application for organizing daily tasks.
 
-## Features (In Progress)
+## Features
 
-- ✅ Task creation with Factory Pattern
-- 🚧 Task management (CRUD operations)
-- 🚧 Sorting and filtering
-- 🚧 Auto-save to localStorage
-
-## Design Patterns
-
-- Factory Pattern (Task creation)
-- More patterns coming soon...
+- Create, edit, and delete tasks
+- Set task priority (High, Medium, Low)
+- Set deadlines
+- Mark tasks as completed
+- Sort and filter tasks
+- Export tasks to file
+- Auto-save to local storage
 
 ## Technologies
 
 - HTML5
 - CSS3
-- Vanilla JavaScript
+- JavaScript (Vanilla)
 
-## Status
+## Project Status
 
-🚧 Day 1 - Basic structure completed
+🚧 Under Development

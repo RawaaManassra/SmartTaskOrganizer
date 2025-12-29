@@ -46,7 +46,7 @@
             </form>
         </section>
 
-        <!-- Controls for Sort and Filter -->
+        <!-- Controls -->
         <section class="controls">
             <div class="sort-filter">
                 <div class="control-group">
@@ -74,21 +74,32 @@
         <!-- Task List -->
         <section class="tasks-section">
             <h2>📝 Task List (<span id="taskCount">0</span>)</h2>
-            <div id="taskList" class="task-list"></div>
+            <div id="taskList" class="task-list">
+                <!-- Tasks will be rendered here dynamically -->
+            </div>
             <div id="emptyState" class="empty-state">
                 <p>No tasks yet. Start by adding a new task! 🚀</p>
             </div>
         </section>
     </div>
 
-  
-
+    <!-- Scripts in correct order - VERY IMPORTANT! -->
+    <!-- 1. Basic classes first -->
     <script src="task.js"></script>
-    <script src="storage.js"></script>
-    <script src="taskManager.js"></script>
+    
+    <!-- 2. Strategies (needed by TaskManager and UI) -->
     <script src="strategies.js"></script>
+    
+    <!-- 3. Storage (needed by TaskManager) -->
+    <script src="storage.js"></script>
+    
+    <!-- 4. TaskManager (uses Task, Strategies, Storage) -->
+    <script src="taskManager.js"></script>
+    
+    <!-- 5. UI Manager (uses Strategies) -->
     <script src="ui.js"></script>
+    
+    <!-- 6. Main App (uses everything) -->
     <script src="app.js"></script>
-</body>
 </body>
 </html>

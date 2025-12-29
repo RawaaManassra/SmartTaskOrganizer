@@ -39,7 +39,7 @@ body {
     font-size: 1.1em;
 }
 
-/* Add Task Section */
+/* Form Section */
 .add-task-section {
     background: #f8f9fa;
     padding: 30px;
@@ -121,7 +121,6 @@ body {
 
 .btn-secondary:hover {
     background: #38a169;
-    transform: translateY(-2px);
 }
 
 /* Controls */
@@ -158,7 +157,7 @@ body {
     font-size: 0.95em;
 }
 
-/* Task List */
+/* Tasks Section */
 .tasks-section h2 {
     color: #333;
     margin-bottom: 20px;
@@ -266,16 +265,6 @@ body {
     color: #22543d;
 }
 
-.overdue-badge {
-    background: #fed7d7;
-    color: #c53030;
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 600;
-    margin-top: 10px;
-}
-
 .task-actions {
     display: flex;
     gap: 8px;
@@ -290,27 +279,20 @@ body {
     font-size: 0.9em;
     cursor: pointer;
     transition: all 0.3s;
-    color: white;
 }
 
 .btn-complete {
     background: #48bb78;
+    color: white;
 }
 
 .btn-complete:hover {
     background: #38a169;
 }
 
-.btn-uncomplete {
-    background: #ed8936;
-}
-
-.btn-uncomplete:hover {
-    background: #dd6b20;
-}
-
 .btn-edit {
     background: #4299e1;
+    color: white;
 }
 
 .btn-edit:hover {
@@ -319,6 +301,7 @@ body {
 
 .btn-delete {
     background: #f56565;
+    color: white;
 }
 
 .btn-delete:hover {
@@ -331,7 +314,6 @@ body {
     padding: 60px 20px;
     color: #718096;
     font-size: 1.2em;
-    display: none;
 }
 
 /* Responsive */
